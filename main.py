@@ -1,15 +1,17 @@
-from typing import Union
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+# from sqlalchemy.orm import Session
+# from config.db import get_db
+# from models.users import User
+# from schemas.schema_user import User_req
 
 app = FastAPI()
 
+@app.get('/')
+def root():
+    return "Hello heroku"
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+# @app.get("/api/users")
+# def get_by_id( db: Session = Depends(get_db)):
+#     #return db.query(User).filter(User.id == id).first()
+#     return db.query(User).all()
+#
