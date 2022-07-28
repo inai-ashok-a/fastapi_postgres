@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from config.db import get_db
 from models.users import User
 from schemas.schema_user import User_req
+from email_validator import validate_email,EmailNotValidError
 
 
 app = FastAPI()
@@ -18,7 +19,13 @@ def get_all_users( db: Session = Depends(get_db)):
 
 
 @app.post('/items',status_code=status.HTTP_201_CREATED)
-def create_an_users( obj:User_req,db: Session = Depends(get_db)):
+def create_an_user( obj:User_req,db: Session = Depends(get_db)):
+     val_email = obj.email
+
+     try:
+         val_email = validate_email(val_email).email
+     except EmailNotValidError as e:
+         return "Please enter valid Email! :("
 
      db_item = db.query(User).filter(User.email == obj.email).first()
 
