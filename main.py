@@ -18,7 +18,7 @@ def get_all_users( db: Session = Depends(get_db)):
     return db.query(User).all()
 
 
-@app.post('/items',status_code=status.HTTP_201_CREATED)
+@app.post('/api/users',status_code=status.HTTP_201_CREATED)
 def create_an_user( obj:User_req,db: Session = Depends(get_db)):
      val_email = obj.email
 
@@ -43,3 +43,18 @@ def create_an_user( obj:User_req,db: Session = Depends(get_db)):
      db.commit()
 
      return db.query(User).all()
+
+
+@app.put('/api/users/{user_id}',status_code=status.HTTP_200_OK)
+def update_an_item(user_id:int,obj:User_req,db: Session = Depends(get_db)):
+    field_to_update=db.query(User).filter(User.id==user_id).first()
+
+    if field_to_update is None:
+        return "Sry !! No User with this id"
+
+    field_to_update.name=obj.name
+    field_to_update.age=obj.age
+
+    db.commit()
+
+    return db.query(User).all()
