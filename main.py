@@ -46,7 +46,7 @@ def create_an_user( obj:User_req,db: Session = Depends(get_db)):
 
 
 @app.put('/api/users/{user_id}',status_code=status.HTTP_200_OK)
-def update_an_item(user_id:int,obj:User_req,db: Session = Depends(get_db)):
+def update_an_user(user_id:int,obj:User_req,db: Session = Depends(get_db)):
     field_to_update=db.query(User).filter(User.id==user_id).first()
 
     if field_to_update is None:
@@ -55,6 +55,19 @@ def update_an_item(user_id:int,obj:User_req,db: Session = Depends(get_db)):
     field_to_update.name=obj.name
     field_to_update.age=obj.age
 
+    db.commit()
+
+    return db.query(User).all()
+
+
+@app.delete('/api/users/{user_id}')
+def delete_user(user_id: int,db: Session = Depends(get_db)):
+    user_to_delete = db.query(User).filter(User.id == user_id).first()
+
+    if user_to_delete is None:
+        return "Sry !! No user with this id...:("
+
+    db.delete(user_to_delete)
     db.commit()
 
     return db.query(User).all()
