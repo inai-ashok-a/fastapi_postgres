@@ -9,4 +9,4 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    age = Column(String,nullable=False)
+    age = Column(Integer,nullable=False)

@@ -6,3 +6,7 @@ class User_req(BaseModel):
     name:str
     email:str
     age:int
+    #
+    class Config:
+        orm_mode=True
+
