@@ -27,10 +27,15 @@ def create_an_user( obj:User_req,db: Session = Depends(get_db)):
      except EmailNotValidError as e:
          return "Please enter valid Email! :("
 
-     db_item = db.query(User).filter(User.email == obj.email).first()
+     db_user_mail = db.query(User).filter(User.email == obj.email).first()
 
-     if db_item is not None:
+     if db_user_mail is not None:
          return "Mail already found!!!"
+
+     db_user_id = db.query(User).filter(User.id == obj.id).first()
+
+     if db_user_id is not None:
+         return "Your user Id already found!!!"
 
      new_user = User(
         id=obj.id,
