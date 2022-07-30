@@ -4,12 +4,12 @@ from config.db import get_db
 from models.users import User
 from schemas.schema_user import User_req
 from email_validator import validate_email,EmailNotValidError
-# from auth.util import get_hashed_password,verify_password
-# from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
+from auth.util import get_hashed_password,verify_password
+from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 
-# reuseable_oauth = OAuth2PasswordBearer(
-#     tokenUrl="/login"
-# )
+reuseable_oauth = OAuth2PasswordBearer(
+    tokenUrl="/login"
+)
 
 
 app = FastAPI()
@@ -21,29 +21,29 @@ def root():
 
 user_email="user_email"
 
-# @app.post('/login')
-# async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-#     user = db.query(User).filter(User.email == form_data.username).first()
-#     if user is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="Incorrect email or password"
-#         )
-#
-#     hashed_pass = (user.password)
-#     if not verify_password(form_data.password, hashed_pass):
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="Incorrect email or password"
-#         )
-#     global user_email
-#     user_email=user.email
-#     return user.name
+@app.post('/login')
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == form_data.username).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect email or password"
+        )
+
+    hashed_pass = user.password
+    if not verify_password(form_data.password, hashed_pass):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect email or password"
+        )
+    global user_email
+    user_email=user.email
+    return user.name
 
 
 
 @app.get("/api/users")
-def get_all_users( db: Session = Depends(get_db)):
+def get_all_users(users: User_req = Depends(reuseable_oauth), db: Session = Depends(get_db)):
     return db.query(User).filter(User.email == user_email).first()
 
 
@@ -70,11 +70,10 @@ def create_an_user( obj:User_req,db: Session = Depends(get_db)):
          return "Password is very short!:("
 
      new_user = User(
-
         name=obj.name,
         email=obj.email,
         age=obj.age,
-        password=(obj.password)
+        password=get_hashed_password(obj.password)
         )
 
      db.add(new_user)
@@ -84,7 +83,7 @@ def create_an_user( obj:User_req,db: Session = Depends(get_db)):
 
 
 @app.put('/api/users/{user_id}',status_code=status.HTTP_200_OK)
-def update_an_user(user_id:int,obj:User_req,db: Session = Depends(get_db)):
+def update_an_user(user_id:int,obj:User_req,db: Session = Depends(get_db),users: User_req = Depends(reuseable_oauth)):
     field_to_update=db.query(User).filter(User.id==user_id).first()
 
     if field_to_update is None:
@@ -99,7 +98,7 @@ def update_an_user(user_id:int,obj:User_req,db: Session = Depends(get_db)):
 
 
 @app.delete('/api/users/{user_id}')
-def delete_user(user_id: int,db: Session = Depends(get_db)):
+def delete_user(user_id: int,db: Session = Depends(get_db),users: User_req = Depends(reuseable_oauth)):
     user_to_delete = db.query(User).filter(User.id == user_id).first()
 
     if user_to_delete is None:
