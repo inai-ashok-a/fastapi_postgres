@@ -43,7 +43,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 
 @app.get("/api/users")
-def get_all_users(users: User_req = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+def get_user(users: User_req = Depends(reuseable_oauth), db: Session = Depends(get_db)):
     return db.query(User).filter(User.email == user_email).first()
 
 
