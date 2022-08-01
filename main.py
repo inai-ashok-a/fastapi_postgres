@@ -112,7 +112,11 @@ def update_an_user(user_email:str,obj:User_req,db: Session = Depends(get_db),use
     field_to_update=db.query(User).filter(User.email==user_email).first()
 
     if field_to_update is None:
-        return "Sry !! No User with this id"
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Sry !! No User with this email"
+        )
+
 
     field_to_update.name=obj.name
     field_to_update.age=obj.age
@@ -134,7 +138,11 @@ def delete_user(email : str,db: Session = Depends(get_db),users: User_req = Depe
     user_to_delete = db.query(User).filter(User.email== email).first()
 
     if user_to_delete is None:
-        return "Sry !! No user with this id...:("
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Sry !! No user with this email...:("
+        )
+
 
     db.delete(user_to_delete)
     db.commit()
